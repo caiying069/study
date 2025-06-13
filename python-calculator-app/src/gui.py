@@ -1,31 +1,30 @@
-import sys
 import os
+import sys
 
-# 添加模块路径到sys.path
+# 将项目根目录添加到 sys.path，方便模块导入
 module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 
-from tkinter import Label, Entry, StringVar, font, Text  # 增加Text
-from src.calculator import Calculator
+from tkinter import Label, Entry, StringVar, font, Text
+from ttkbootstrap import Window, Button, Frame  # 第三方库
+from src.calculator import Calculator           # 项目内模块
 from src.utils import validate_number, format_result
-from ttkbootstrap import Window, Button, Frame  # 用ttkbootstrap的控件
-
-
 
 class YI_ZHONG_JI_SUAN_QI:
     def __init__(self, master):
         """
-        初始化YI_ZHONG_JI_SUAN_QI类的实例。
+        初始化 YI_ZHONG_JI_SUAN_QI 类的实例。
         参数:
-        master (Tk): 主窗口对象。
+            master (Tk): 主窗口对象。
         """
         self.master = master
         master.title("计算器_v1")
         master.configure(bg="#f0f0f0")  # 设置窗口背景色
         # master.geometry("600x600")  # 设置窗口大小
         # master.resizable(False, False)  # 禁止调整窗口大小
-        master.iconbitmap("python-calculator-app\src\ico\output.ico")  # 设置窗口图标
+        icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'ico', 'output.ico'))
+        master.iconbitmap(icon_path)  # 设置窗口图标
         master.wm_attributes("-topmost", True)  # 窗口置顶
 
         # 设置统一字体
@@ -38,7 +37,8 @@ class YI_ZHONG_JI_SUAN_QI:
 
     def create_widgets(self):
         # 记录框
-        self.log_text = Text(self.master, height=3, font=self.default_font, state='disabled', bg="#f8f8f8", bd=0, highlightthickness=0)
+        self.log_text = Text(self.master, height=3, font=self.default_font, state='disabled',
+                             bg="#f8f8f8", bd=0, highlightthickness=0)
         self.log_text.pack(fill='x', padx=20, pady=(10, 0), ipady=3)
 
         # 输入框
