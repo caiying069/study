@@ -21,8 +21,8 @@ class YI_ZHONG_JI_SUAN_QI:
         self.master = master
         master.title("计算器_v1")
         master.configure(bg="#f0f0f0")  # 设置窗口背景色
-        # master.geometry("600x600")  # 设置窗口大小
-        # master.resizable(False, False)  # 禁止调整窗口大小
+        master.geometry("600x600")  # 设置窗口大小
+        master.resizable(False, False)  # 禁止调整窗口大小
         icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'ico', 'output.ico'))
         master.iconbitmap(icon_path)  # 设置窗口图标
         master.wm_attributes("-topmost", True)  # 窗口置顶
@@ -30,8 +30,9 @@ class YI_ZHONG_JI_SUAN_QI:
         # 设置统一字体
         self.default_font = font.Font(family="微软雅黑", size=14)
 
+        # 初始化计算器实例
         self.calculator = Calculator()
-        self.result_var = StringVar()
+        self.result_var = StringVar(self.master)
 
         self.create_widgets()
 
@@ -52,6 +53,7 @@ class YI_ZHONG_JI_SUAN_QI:
         num_frame.pack(side='top', fill='both', expand=True,padx=20, pady=(0, 20))
 
         btn_texts = [
+            ('C'),
             ('1/x', 'x^2', '√', '÷'),
             ('7', '8', '9', '×'),
             ('4', '5', '6', '-'),
@@ -90,7 +92,7 @@ class YI_ZHONG_JI_SUAN_QI:
                             width=6, 
                             bootstyle="secondary", 
                             command=lambda t=text: self.on_number_button(t)
-                        )
+                        )                        pip show notebook                        pip show notebook
                     btn.grid(row=r, column=c, padx=5, pady=5, sticky='nsew')
         for i in range(4):
             num_frame.columnconfigure(i, weight=1)
@@ -126,25 +128,18 @@ class YI_ZHONG_JI_SUAN_QI:
         self.log(f"输入：{self.entry.get()}  操作：÷")
         self.calculate(self.calculator.divide)
 
-    def equal(self):
-        # 只在有待运算时才执行
-        if hasattr(self, 'first_number') and hasattr(self, 'pending_operation'):
-            input_text = self.entry.get().strip()
-            if not validate_number(input_text):
-                self.entry.delete(0, 'end')
-                self.entry.insert(0, "请输入第二个数字。")
-                return
-            second_number = float(input_text)
-            try:
-                result = self.pending_operation(self.first_number, second_number)
-                self.log(f"{self.first_number} {self._get_op_symbol()} {second_number} = {result}")
-                self.entry.delete(0, 'end')
-                self.entry.insert(0, str(result))
-            except ValueError as e:
-                self.entry.delete(0, 'end')
-                self.entry.insert(0, str(e))
-            del self.first_number
-            del self.pending_operation
+    def on_equal(self):
+        expr = self.result_var.get()
+        try:
+            result = self.calculator.calculate(expr)
+            self.result_var.set(result)
+            # 添加计算过程到记录框
+            self.log_text.config(state='normal')
+            self.log_text.insert('end', f"{expr} = {result}\n")
+            self.log_text.see('end')  # 滚动到最后
+            self.log_text.config(state='disabled')
+        except Exception as e:
+            self.result_var.set("错误")
 
     def _get_op_symbol(self):
         # 辅助方法，返回当前运算符号
@@ -159,34 +154,7 @@ class YI_ZHONG_JI_SUAN_QI:
                 return '÷'
         return '?'
 
-    def calculate(self, operation):
-        if not hasattr(self, 'first_number'):
-            input_text = self.entry.get().strip()
-            if not validate_number(input_text):
-                self.entry.delete(0, 'end')
-                self.entry.insert(0, "请输入第一个数字。")
-                return
-            self.first_number = float(input_text)
-            self.entry.delete(0, 'end')
-            self.entry.insert(0, "请输入第二个数字，然后再次点击运算按钮。")
-            self.pending_operation = operation
-            return
 
-        input_text = self.entry.get().strip()
-        if not validate_number(input_text):
-            self.entry.delete(0, 'end')
-            self.entry.insert(0, "请输入第二个数字。")
-            return
-        second_number = float(input_text)
-        try:
-            result = self.pending_operation(self.first_number, second_number)
-            self.entry.delete(0, 'end')
-            self.entry.insert(0, str(result))
-        except ValueError as e:
-            self.entry.delete(0, 'end')
-            self.entry.insert(0, str(e))
-        del self.first_number
-        del self.pending_operation
 
 if __name__ == "__main__":
     root = Window(themename="cosmo")  # 使用ttkbootstrap的Window和主题
