@@ -11,6 +11,8 @@ from ttkbootstrap import Window, Button, Frame  # 第三方库
 from src.calculator import Calculator           # 项目内模块
 from src.utils import validate_number, format_result
 
+
+
 class YI_ZHONG_JI_SUAN_QI:
     def __init__(self, master):
         """
